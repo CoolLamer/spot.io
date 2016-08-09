@@ -1,0 +1,42 @@
+extends layout
+
+block content
+    div(id='map')
+    form
+        input(id='m' autocomplete='off')
+
+block scripts
+    script(src = '/socket.io/socket.io.js')
+    script(src = 'http://code.jquery.com/jquery-1.11.1.js')
+    script(type='text/javascript').
+        var socket = io();
+        var map;
+        function initMap() {
+            map = new google.maps.Map(document.getElementById('map'), {
+                center: {lat: 49.830383, lng: 15.5660895},
+                zoom: 8
+            });
+
+            map.addListener('click', function (e) {
+                console.log('sending-event');
+                var message = $('#m').val();
+                if (message !== '') {
+                    socket.emit('click', {position: e.latLng, message: $('#m').val()});
+                    $('#m').val('');
+                }
+            });
+
+            socket.on('message', function (data) {
+                console.log(data);
+                var infowindow = new google.maps.InfoWindow({
+                    content: data.message
+                });
+                var marker = new google.maps.Marker({
+                    position: data.position,
+                    map: map,
+                    title: ''
+                });
+                infowindow.open(map, marker);
+            });
+        }
+    script(src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyAIJqsYO0YaYfDPt4aalBsonkpDdjELl5s&callback=initMap' async defer)
