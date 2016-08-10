@@ -54,7 +54,8 @@ block scripts
                     });
                     infowindows[data.id] = new google.maps.InfoWindow({
                         content: createInfoText(data)
-                    }).open(map, markers[data.id]);
+                    });
+                    infowindows[data.id].open(map, markers[data.id]);
                 }else{
                     markers[data.id].setPosition(data.location);
                     infowindows[data.id].setContent(createInfoText(data));
