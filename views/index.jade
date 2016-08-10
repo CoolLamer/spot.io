@@ -15,6 +15,8 @@ block scripts
             $('#online').text('Online ' + online);
         });
         var map;
+        var markers = {};
+        var infowindows = {};
         function initMap() {
             map = new google.maps.Map(document.getElementById('map'), {
                 center: {lat: 49.830383, lng: 15.5660895},
@@ -27,6 +29,7 @@ block scripts
                 if (message !== '') {
                     socket.emit('click', {position: e.latLng, message: $('#m').val()});
                     $('#m').val('');
+                    socket.emit('update', {location: e.latLng, actualSpeed: 5, gpsDistance: 10, speedDistance: 12})
                 }
             });
 
@@ -42,5 +45,24 @@ block scripts
                 });
                 infowindow.open(map, marker);
             });
+
+            socket.on('update', function (data){
+                if(typeof markers[data.id] == 'undefined'){
+                    markers[data.id] = new google.maps.Marker({
+                        position: data.location,
+                        map: map
+                    });
+                    infowindows[data.id] = new google.maps.InfoWindow({
+                        content: createInfoText(data)
+                    }).open(map, markers[data.id]);
+                }else{
+                    markers[data.id].setPosition(data.location);
+                    infowindows[data.id].setContent(createInfoText(data));
+                }
+            });
+
+            function createInfoText(data){
+                return data.actualSpeed + 'km/h ' + 'GPS Distance: ' + data.gpsDistance + 'm Speed Distance: ' + data.speedDistance + 'm'
+            }
         }
     script(src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyAIJqsYO0YaYfDPt4aalBsonkpDdjELl5s&callback=initMap' async defer)

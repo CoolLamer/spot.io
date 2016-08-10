@@ -12,7 +12,12 @@ function socket(http){
             console.log('send message');
             io.emit('message', data);
             messages.push(data);
-        })
+        });
+
+        socket.on('update', function(data){
+            data.id = socket.id;
+            io.emit('update', data);
+        });
     });
     return io;
 }
