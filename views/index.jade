@@ -29,7 +29,6 @@ block scripts
                 if (message !== '') {
                     socket.emit('click', {position: e.latLng, message: $('#m').val()});
                     $('#m').val('');
-                    socket.emit('update', {location: e.latLng, actualSpeed: 5, gpsDistance: 10, speedDistance: 12})
                 }
             });
 
